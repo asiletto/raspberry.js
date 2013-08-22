@@ -1,0 +1,29 @@
+{
+  "name": "raspberry.js",
+  "version": "0.0.1",
+  "description": "Raspberry pi, sensors and node.js integration",
+  "main": "main.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "sqlite3": "~2.1.15"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asiletto/raspberry.js.git"
+  },
+  "keywords": [
+    "raspberry",
+    "pi",
+    "sensors",
+    "temperature",
+    "humidity"
+  ],
+  "author": "Alessandro Siletto",
+  "license": "GNU GENERAL PUBLIC LICENSE"
+}
