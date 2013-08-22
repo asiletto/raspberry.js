@@ -1,4 +1,5 @@
 {
+
   "name": "raspberry.js",
   "version": "0.0.1",
   "description": "Raspberry pi, sensors and node.js integration",
