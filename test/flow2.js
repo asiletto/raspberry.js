@@ -14,9 +14,38 @@ repo.setActuator("RISCALDATORE", "off");
 repo.setActuator("VENTOLA", "off");
 repo.setActuator("TAPPETINO", "on");
 
-console.log("initial facts:", repo.facts);
+new cronJob('*/2 * * * * *', function(){
+  console.log("exec");
+  console.log("facts:", repo.facts);
+  console.log("===========================");
 
-var result = j.execute(repo.facts);
 
-console.log("result: ", result);
+  var result = j.execute(repo.facts);
+
+  if(result.changes == undefined)
+    console.log("no changes");
+  else {
+//    console.log("changes: ", result.changes);
+    for (var key in result.changes) {
+	var value = result.changes[key];
+        console.log("setting "+key+"="+value);
+        repo.setActuator(key, value);
+    }
+  }
+
+
+  //simulate temp changes
+  if(repo.getActuator("RISCALDATORE") == "on")
+    repo.setSensor("TEMP1", repo.getSensor("TEMP1") + 1 );
+  else
+    repo.setSensor("TEMP1", repo.getSensor("TEMP1") - 0.5 );
+
+  if(repo.getActuator("VENTOLA") == "on")
+    repo.setSensor("TEMP1", repo.getSensor("TEMP1") - 0.5 );
+
+   
+
+
+
+}, null, true, null);
 

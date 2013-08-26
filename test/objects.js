@@ -33,6 +33,17 @@ function setSensor(name, temp){
 
 exports.setSensor = setSensor;
 
+function getSensor(name){
+
+ for(var i=0;i<facts.sensors.length;i++)
+  if(facts.sensors[i].name == name)
+    return facts.sensors[i].temp;
+ return undefined;
+
+}
+
+exports.getSensor = getSensor;
+
 function setActuator(name, state){
  var found = false;
  for(var i=0;i<facts.actuators.length;i++){
@@ -47,3 +58,11 @@ function setActuator(name, state){
 
 exports.setActuator = setActuator;
 
+function getActuator(name){
+for(var i=0;i<facts.actuators.length;i++)
+  if(facts.actuators[i].name == name)
+    return facts.actuators[i].state;
+return undefined;
+}
+
+exports.getActuator = getActuator;
