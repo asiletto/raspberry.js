@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Highcharts Example</title>
+
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script src="highcharts.js"></script>
+		<script src="highcharts-more.js"></script>
+		<script src="highcharts-draggable.js"></script>
+		<script src="highcharts-exporting.js"></script>
+
+		<script type="text/javascript">
+$(function () {
+	
+	var gap = 1;
+	
+	var temperatures = [
+			[1, 22],
+			[2, 22],
+			[3, 22],
+			[4, 22],
+			[5, 22.2],
+			[6, 22.5],
+			[7, 23],
+			[8, 23.5],
+			[9, 24],
+			[10, 24.5],
+			[11, 25],
+			[12, 25.5],
+			[13, 25.8],
+			[14, 26],
+			[15, 26],
+			[16, 25.8],
+			[17, 25.5],
+			[18, 25],
+			[19, 24],
+			[20, 23],
+			[21, 22.5],
+			[22, 22],
+			[23, 22]
+		];
+
+		var options = {
+			
+			chart: {
+				renderTo: 'container',
+				animation: false,
+				zoomType: 'x'
+			},
+			
+		    title: {
+		        text: 'Daily temperatures'
+		    },
+		
+		    xAxis: {
+		    //    type: 'datetime'
+		        title: {
+		            text: "Hour of day"
+		        }
+		    },
+		    
+		    yAxis: {
+		        title: {
+		            text: "Temperature"
+		        },
+				labels: {
+					format: '{value} °C'
+				}
+		    },
+			
+			xAxis: {
+				labels: {
+					format: '{value}:00'
+				}
+		    },
+			
+		    tooltip: {
+		        crosshairs: true,
+		        shared: true,
+				valueDecimals: 1,
+				headerFormat: 'Temp at {point.key}:00<br/>',
+		        valueSuffix: '°C'
+		    },
+		    
+			plotOptions: {
+				series: {
+					cursor: 'ns-resize',
+					point: {
+						events: {
+							
+							drag: function(e) {
+								// Returning false stops the drag and drops. Example:
+								/*
+								if (e.newY > 300) {
+									this.y = 300;
+									return false;
+								}
+								*/
+								$('#drag').html(
+									'Dragging <b>' + this.series.name + '</b>, <b>' +
+									this.category + '</b> to <b>' + 
+									Highcharts.numberFormat(e.newY, 2) + '</b>'
+								);
+							},
+							drop: function() {
+								$('#drop').html(
+									'In <b>' + this.series.name + '</b>, <b>' +
+									this.category + '</b> was set to <b>' + 
+									Highcharts.numberFormat(this.y, 2) + '</b>'
+								);
+								
+								chart.series[1].data[this.x-1].update([this.y+gap, this.y-gap]); 
+							}
+						}
+					},
+					stickyTracking: false
+				},
+				column: {
+					stacking: 'normal'
+				}
+			},
+			
+		    legend: {
+				text: "ciao"
+		    },
+		
+		    series: [{
+		    	name: 'Temperature',
+		    	data: temperatures,
+				draggableY: true,
+		    	zIndex: 1,
+		    	marker: {
+		    		fillColor: 'white',
+		    		lineWidth: 2,
+		    		lineColor: Highcharts.getOptions().colors[0]
+		    	}
+		    }],
+			
+			exporting: {
+            sourceWidth: 800,
+            sourceHeight: 300,
+        }
+		
+		};
+		
+		var rangeSerie = {
+		        name: 'Range',
+		        data: [],
+		        type: 'arearange',
+		        lineWidth: 0,
+		    	linkedTo: ':previous',
+		    	color: Highcharts.getOptions().colors[0],
+		    	fillOpacity: 0.3,
+		    	zIndex: 0
+            };
+		//initial range
+		for(var i=0;i<temperatures.length;i++){
+			var item = temperatures[i];
+			//alert(item[0]);
+			rangeSerie.data.push([item[0], item[1]+gap, item[1]-gap]);
+		}
+		options.series.push(rangeSerie);
+		 
+    	var chart = new Highcharts.Chart(options);
+    
+});
+		</script>
+	</head>
+	<body>
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<div id="drag"></div>
+<div id="drop"></div>
+
+	</body>
+</html>
