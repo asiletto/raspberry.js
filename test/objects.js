@@ -1,3 +1,6 @@
+var FixedQueue = require('./fixed-queue.js').FixedQueue;
+var qlen = 6;
+
 var facts = {
   sensors: [],
   actuators: []
@@ -6,6 +9,8 @@ var facts = {
 exports.facts = facts;
 
 var sensor = function(name, temp){
+  this.queue = new FixedQueue(qlen);
+  this.queue.push(temp);
   this.name = name;
   this.temp = temp;
 };
@@ -24,6 +29,7 @@ function setSensor(name, temp){
  for(var i=0;i<facts.sensors.length;i++){
   if(facts.sensors[i].name == name){
     facts.sensors[i].temp = temp;
+    facts.sensors[i].queue.push(temp);
     found = true;
   }
  }
@@ -41,6 +47,24 @@ function getSensor(name){
  return undefined;
 
 }
+
+function getSensorAverage(name){
+
+for(var i=0;i<facts.sensors.length;i++)
+  if(facts.sensors[i].name == name){
+   var elmt = facts.sensors[i].queue;
+   var sum = 0;
+   for(var i = 0; i < elmt.length; i++){
+     sum += parseInt(elmt[i]);
+   }
+
+   var avg = sum/elmt.length;
+   return avg;
+  }
+ return undefined;
+}
+
+exports.getSensorAverage = getSensorAverage;
 
 exports.getSensor = getSensor;
 

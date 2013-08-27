@@ -14,11 +14,11 @@ repo.setActuator("RISCALDATORE", "off");
 repo.setActuator("VENTOLA", "off");
 repo.setActuator("TAPPETINO", "on");
 
-new cronJob('*/2 * * * * *', function(){
+new cronJob('* * * * * *', function(){
   console.log("exec");
   console.log("facts:", repo.facts);
   console.log("===========================");
-
+  console.log("getAverage(TEMP1):", repo.getSensorAverage("TEMP1"));
 
   var result = j.execute(repo.facts);
 
