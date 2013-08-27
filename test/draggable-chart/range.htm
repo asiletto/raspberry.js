@@ -9,13 +9,19 @@
 		<script src="highcharts-more.js"></script>
 		<script src="highcharts-draggable.js"></script>
 		<script src="highcharts-exporting.js"></script>
+		<script src="chart.js"></script>
 
 		<script type="text/javascript">
 $(function () {
-	
-	var gap = 1;
-	
-	var temperatures = [
+
+	var Tgap = 1;
+	var TvalueLabel="Temperature";
+	var TchartTitle="Daily temperatures (arena)";
+	var TxAxisFormat='{value} °C';
+	var TtooltipSuffix='°C';
+	var TyAxisFormat='{value}:00';
+	var TtooltipFormat='Value at {point.key}:00<br/>';
+	var Tvalues = [
 			[1, 22],
 			[2, 22],
 			[3, 22],
@@ -40,137 +46,173 @@ $(function () {
 			[22, 22],
 			[23, 22]
 		];
+	
+	var T2gap = 0.5;
+	var T2valueLabel="Temperature";
+	var T2chartTitle="Daily temperatures (nest)";
+	var T2xAxisFormat='{value} °C';
+	var T2tooltipSuffix='°C';
+	var T2yAxisFormat='{value}:00';
+	var T2tooltipFormat='Value at {point.key}:00<br/>';
+	var T2values = [
+			[1, 24.2],
+			[2, 24.3],
+			[3, 24.4],
+			[4, 24.5],
+			[5, 24.6],
+			[6, 24.7],
+			[7, 24.8],
+			[8, 24.9],
+			[9, 25],
+			[10, 25],
+			[11, 25],
+			[12, 25],
+			[13, 25],
+			[14, 25],
+			[15, 25],
+			[16, 24.9],
+			[17, 24.8],
+			[18, 24.7],
+			[19, 24.6],
+			[20, 24.5],
+			[21, 24.4],
+			[22, 24.3],
+			[23, 24.2]
+		];
+	
+	var Hgap = 10;
+	var HvalueLabel="Humidity";
+	var HchartTitle="Daily humidity (arena)";
+	var HxAxisFormat='{value} %';
+	var HtooltipSuffix='%';
+	var HyAxisFormat='{value}:00';
+	var HtooltipFormat='Value at {point.key}:00<br/>';
+	
+	var Hvalues = [
+			[1, 60],
+			[2, 60],
+			[3, 60],
+			[4, 58],
+			[5, 55],
+			[6, 50],
+			[7, 45],
+			[8, 40],
+			[9, 35],
+			[10, 32],
+			[11, 30],
+			[12, 30],
+			[13, 30],
+			[14, 30],
+			[15, 30],
+			[16, 30],
+			[17, 32],
+			[18, 35],
+			[19, 40],
+			[20, 45],
+			[21, 50],
+			[22, 55],
+			[23, 60]
+		];
 
-		var options = {
-			
-			chart: {
-				renderTo: 'container',
-				animation: false,
-				zoomType: 'x'
-			},
-			
-		    title: {
-		        text: 'Daily temperatures'
-		    },
+	var H2gap = 10;
+	var H2valueLabel="Humidity";
+	var H2chartTitle="Daily humidity (nest)";
+	var H2xAxisFormat='{value} %';
+	var H2tooltipSuffix='%';
+	var H2yAxisFormat='{value}:00';
+	var H2tooltipFormat='Value at {point.key}:00<br/>';
+	
+	var H2values = [
+			[1, 60],
+			[2, 60],
+			[3, 60],
+			[4, 60],
+			[5, 60],
+			[6, 60],
+			[7, 60],
+			[8, 60],
+			[9, 60],
+			[10, 60],
+			[11, 60],
+			[12, 60],
+			[13, 60],
+			[14, 60],
+			[15, 60],
+			[16, 60],
+			[17, 60],
+			[18, 60],
+			[19, 60],
+			[20, 60],
+			[21, 60],
+			[22, 60],
+			[23, 60]
+		];
 		
-		    xAxis: {
-		    //    type: 'datetime'
-		        title: {
-		            text: "Hour of day"
-		        }
-		    },
-		    
-		    yAxis: {
-		        title: {
-		            text: "Temperature"
-		        },
-				labels: {
-					format: '{value} °C'
-				}
-		    },
-			
-			xAxis: {
-				allowDecimals: false,
-				labels: {
-					format: '{value}:00'
-				}
-		    },
-			
-		    tooltip: {
-		        crosshairs: true,
-		        shared: true,
-				valueDecimals: 1,
-				headerFormat: 'Temp at {point.key}:00<br/>',
-		        valueSuffix: '°C'
-		    },
-		    
-			plotOptions: {
-				series: {
-					cursor: 'ns-resize',
-					point: {
-						events: {
-							
-							drag: function(e) {
-								// Returning false stops the drag and drops. Example:
-								/*
-								if (e.newY > 300) {
-									this.y = 300;
-									return false;
-								}
-								*/
-								$('#drag').html(
-									'Dragging <b>' + this.series.name + '</b>, <b>' +
-									this.category + '</b> to <b>' + 
-									Highcharts.numberFormat(e.newY, 2) + '</b>'
-								);
-							},
-							drop: function() {
-								$('#drop').html(
-									'In <b>' + this.series.name + '</b>, <b>' +
-									this.category + '</b> was set to <b>' + 
-									Highcharts.numberFormat(this.y, 2) + '</b>'
-								);
-								
-								chart.series[1].data[this.x-1].update([this.y+gap, this.y-gap]); 
-							}
-						}
-					},
-					stickyTracking: false
-				},
-				column: {
-					stacking: 'normal'
-				}
-			},
-			
-		    legend: {
-				text: "ciao"
-		    },
+	var Vgap = 1;
+	var VvalueLabel="Level";
+	var VchartTitle="Water level (moat)";
+	var VxAxisFormat='{value} cm';
+	var VtooltipSuffix='cm';
+	var VyAxisFormat='{value}:00';
+	var VtooltipFormat='Value at {point.key}:00<br/>';
+	
+	var Vvalues = [
+			[1, 2],
+			[2, 2],
+			[3, 2],
+			[4, 2],
+			[5, 2],
+			[6, 2],
+			[7, 2],
+			[8, 2],
+			[9, 2],
+			[10, 2],
+			[11, 2],
+			[12, 2],
+			[13, 2],
+			[14, 2],
+			[15, 2],
+			[16, 2],
+			[17, 2],
+			[18, 2],
+			[19, 2],
+			[20, 2],
+			[21, 2],
+			[22, 2],
+			[23, 2]
+		];
 		
-		    series: [{
-		    	name: 'Temperature',
-		    	data: temperatures,
-				draggableY: true,
-		    	zIndex: 1,
-		    	marker: {
-		    		fillColor: 'white',
-		    		lineWidth: 2,
-		    		lineColor: Highcharts.getOptions().colors[0]
-		    	}
-		    }],
-			
-			exporting: {
-            sourceWidth: 800,
-            sourceHeight: 300,
-        }
-		
-		};
-		
-		var rangeSerie = {
-		        name: 'Range',
-		        data: [],
-		        type: 'arearange',
-		        lineWidth: 0,
-		    	linkedTo: ':previous',
-		    	color: Highcharts.getOptions().colors[0],
-		    	fillOpacity: 0.3,
-		    	zIndex: 0
-            };
-		//initial range
-		for(var i=0;i<temperatures.length;i++){
-			var item = temperatures[i];
-			//alert(item[0]);
-			rangeSerie.data.push([item[0], item[1]+gap, item[1]-gap]);
-		}
-		options.series.push(rangeSerie);
-		 
-    	var chart = new Highcharts.Chart(options);
+		var chartT = buildDailyChart('containerT', Tgap, TvalueLabel, TchartTitle, TxAxisFormat, TtooltipSuffix, TyAxisFormat, TtooltipFormat, Tvalues, '#FF0000');
+
+		var chartT2 = buildDailyChart('containerT2', T2gap, T2valueLabel, T2chartTitle, T2xAxisFormat, T2tooltipSuffix, T2yAxisFormat, T2tooltipFormat, T2values, '#8A0808');
     
+		var chartH = buildDailyChart('containerH', Hgap, HvalueLabel, HchartTitle, HxAxisFormat, HtooltipSuffix, HyAxisFormat, HtooltipFormat, Hvalues, '#0000FF');
+
+		var chartH2 = buildDailyChart('containerH2', H2gap, H2valueLabel, H2chartTitle, H2xAxisFormat, H2tooltipSuffix, H2yAxisFormat, H2tooltipFormat, H2values, '#000FFF');
+
+		var chartV = buildDailyChart('containerV', Vgap, VvalueLabel, VchartTitle, VxAxisFormat, VtooltipSuffix, VyAxisFormat, VtooltipFormat, Vvalues, '#00FFFF');
 });
 		</script>
 	</head>
 	<body>
 
-<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<div id="containerT" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br/>
+<hr/>
+<br/>
+<div id="containerT2" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br/>
+<hr/>
+<br/>
+<div id="containerH" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br/>
+<hr/>
+<br/>
+<div id="containerH2" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br/>
+<hr/>
+<br/>
+<div id="containerV" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 <div id="drag"></div>
 <div id="drop"></div>
 
