@@ -1,6 +1,6 @@
-var DHT22 = require('../lib/DHT22').DHT22;
-var DS18B20 = require('../lib/DS18B20').DS18B20;
-var dao = require('../bedao').BeDAO;
+var DHT22 = require('./lib/DHT22').DHT22;
+var DS18B20 = require('./lib/DS18B20').DS18B20;
+var dao = require('./bedao').BeDAO;
 var cronJob = require('cron').CronJob;
 
 var driverMap = {
@@ -18,13 +18,13 @@ function addToMeasure(measure, measures){
 			measures[item.sensor] = item.value;
 		}
 	}else{
-		console.log("measure not valid", measure);
+		console.log(new Date()+ " measure not valid", measure);
 	}
 }
 
 setTimeout(function(){
 	//wait the connection to be available...
-	new cronJob('*/2 * * * * *', function(){
+	new cronJob('0 * * * * *', function(){
 		
 		var measures = {};
 		//read all enabled sensors
