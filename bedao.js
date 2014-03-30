@@ -36,10 +36,34 @@ BeDAO.prototype.getCollection= function(name, callback) {
 };
 
 BeDAO.prototype.getSensors = function(callback){
-	this.adb.collection(this.tables.config).find({enabled:true}, {sort:"order"}).toArray(callback);
+	this.adb.collection(this.tables.config).find({type:"sensor",enabled:true}, {sort:"order"}).toArray(callback);
 };
 
-BeDAO.prototype.onSample = function(measures){
+BeDAO.prototype.getActuators = function(callback){
+	this.adb.collection(this.tables.config).find({type:"actuator",enabled:true}, {sort:"order"}).toArray(callback);
+};
+
+function mergeArray(array1,array2) {
+  var ret = {};
+  for(item in array1) {
+    ret[item] = array1[item];
+  }
+  for(item in array2) {
+    ret[item] = array2[item];
+  }
+  return ret;
+}
+
+BeDAO.prototype.onSample = function(measures, measuresActuators){
+	
+	var merged = mergeArray(measures,measuresActuators);
+	
+	//add the actuators only to raw collection?
+	this.adb.collection(this.tables.raw).insert( merged ,
+		function (err, inserted) {
+			if(err) console.log("error:", err);
+		}
+	);
 
    var hour = new Date( measures.timestamp.getFullYear(), 
                                   measures.timestamp.getMonth(),
@@ -49,33 +73,28 @@ BeDAO.prototype.onSample = function(measures){
    var day = new Date( measures.timestamp.getFullYear(),
                                   measures.timestamp.getMonth(),
                                   measures.timestamp.getDate() ); 
+	
+		var increment = {};
+		for(var key in measures){
+			var value = measures[key];
+			if(key != "timestamp"){
+				increment[key + '.sum' ] = parseFloat(value);
+				increment[key + '.count' ] = 1;
+			}
+		}
+			
+		this.adb.collection(this.tables.hourly).update( { 'timestamp': hour }, { $inc: increment },  {upsert:true},
+			function (err, inserted) {
+				if(err) console.log("error:", err); 
+			}
+		);
 
-	var increment = {};
-	for(var key in measures){
-		var value = measures[key];
-		if(key != "timestamp"){
-			increment[key + '.sum' ] = parseFloat(value);
-			increment[key + '.count' ] = 1;
-		}
-	}
-		
-	this.adb.collection(this.tables.hourly).update( { 'timestamp': hour }, { $inc: increment },  {upsert:true},
-		function (err, inserted) {
-			if(err) console.log("error:", err); 
-		}
-	);
-
-	this.adb.collection(this.tables.daily).update( { 'timestamp': day }, { $inc: increment } , {upsert:true}, 
-		function (err, inserted) {
-			if(err) console.log("error:", err);
-		}
-	);
-
-   this.adb.collection(this.tables.raw).insert( measures,
-		function (err, inserted) {
-			if(err) console.log("error:", err);
-		}
-	);
+		this.adb.collection(this.tables.daily).update( { 'timestamp': day }, { $inc: increment } , {upsert:true}, 
+			function (err, inserted) {
+				if(err) console.log("error:", err);
+			}
+		);
+	
 
 }
 

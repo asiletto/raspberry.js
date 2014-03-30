@@ -1,24 +1,11 @@
 var gpio = require('../gpio').gpio;
 
-gpio.setSockets({
-	"s1" : "4",
-	"s2" : "2",
-	"s3" : "1",
-	"s4" : "15"
-});
+var blatte = {name:"blatte",pin:"4"};
+var formicheBianco = {name:"formiche(bianco)",pin:"2"};
+var formicheGrigio = {name:"formiche(grigio)",pin:"1"};
 
-//gpio.writeAll("1");
-//gpio.write("s2","0");
-//gpio.write("s3","0");
-//gpio.write("s4","0");
+function defaultCallback(actuator, value){
+	console.log("setted "+actuator.name+" socket on value "+value);
+}
 
-
-gpio.write("s1", 1, function(){
-	console.log("setted");
-});
-gpio.write("s2", 1, function(){
-	console.log("setted");
-});
-gpio.write("s3", 1, function(){
-	console.log("setted");
-});
+gpio.write(blatte, 1, defaultCallback);

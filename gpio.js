@@ -1,41 +1,31 @@
 var gpio = function(){
 	this.GPIO_CMD = "/usr/local/bin/gpio";
-	this.sockets = {};
 }
 
 exports.gpio = new gpio();
 
-gpio.prototype.setSockets = function(sockets){
-	this.sockets = sockets;
-};
-
-gpio.prototype.writeAll = function(value){
-	for (var key in this.sockets) {
-		this.setSocket(key, value);
-	}
-}
-
-gpio.prototype.read = function(number, callback){
+gpio.prototype.read = function(actuator, callback){
 	var exec = require('child_process').exec;
-	var command = this.GPIO_CMD + ' read '+this.sockets[number];
-//console.log("executing: "+command);
+	var command = this.GPIO_CMD + ' read '+actuator.pin;
+
 	exec(command, function (error, stdout, stderr) {
 		if(error)
 			throw error;
-
-		callback(stdout);
+			
+		var strOut = stdout.replace(/(\r\n|\n|\r)/gm,"");
+	
+		callback(actuator, parseInt(strOut) );
 	});
 }
 
-
-gpio.prototype.write = function(number, value, callback){
+gpio.prototype.write = function(actuator, value, callback){
 	var exec = require('child_process').exec;
-	var command = this.GPIO_CMD + ' write '+this.sockets[number]+' '+value;
-//console.log("executing: "+command);
+	var command = this.GPIO_CMD + ' write '+actuator.pin+' '+value;
+
 	exec(command, function (error, stdout, stderr) {
 		if(error)
 			throw error;
 		
-		callback();
+		callback(actuator, parseInt(value));
 	});
 }

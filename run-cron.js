@@ -4,28 +4,32 @@ var dao = require('./bedao').BeDAO;
 var cronJob = require('cron').CronJob;
 var gpio = require('./gpio').gpio;
 
-gpio.setSockets({
-	"s1" : "4",
-	"s2" : "2",
-	"s3" : "1",
-	"s4" : "15"
-});
+var blatte = {name:"blatte",pin:"4"};
+var formicheBianco = {name:"formiche(bianco)",pin:"2"};
+var formicheGrigio = {name:"formiche(grigio)",pin:"1"};
+
+function defaultCallback(actuator, value){
+	console.log("setted "+actuator.name+" socket on value "+value);
+}
 
 //test: open all the power sockets
-gpio.write("s1", 1, function(){
-	console.log("setted s1 socket on");
-});
-gpio.write("s2", 1, function(){
-	console.log("setted s2 socket on");
-});
-gpio.write("s3", 1, function(){
-	console.log("setted s3 socket on");
-});
+gpio.write(blatte, 1, defaultCallback);
+gpio.write(formicheBianco, 1, defaultCallback);
+gpio.write(formicheGrigio, 1, defaultCallback);
 
 var driverMap = {
 	"DHT22" : DHT22,
 	"DS18B20": DS18B20
 };
+
+var after = function(times, func) {
+    return function() {
+      if (--times < 1) {
+        return func.apply(this, arguments);
+      }
+    };
+  };
+
 
 function addToMeasure(measure, measures){
 	if(measures.timestamp === undefined)
@@ -41,11 +45,23 @@ function addToMeasure(measure, measures){
 	}
 }
 
+function addActuatorToMeasure(id, value, measures){
+	if(measures.timestamp === undefined)
+		measures.timestamp = new Date();
+
+		measures[id] = value;
+}
+
+function notifyMeasures(measuresSensors, measuresActuators){
+	dao.onSample(measuresSensors, measuresActuators);
+}
+
 setTimeout(function(){
 	//wait the connection to be available...
 	new cronJob('0 * * * * *', function(){
 		
-		var measures = {};
+		var measuresSensors = {};
+		var measuresActuators = {};
 		//read all enabled sensors
 		dao.getSensors(function(err, sensors){
 			for(var i in sensors){
@@ -53,11 +69,25 @@ setTimeout(function(){
 				var driver = new driverMap[sensor.sensor](sensor);
 				//read sensor value(s)
 				var readValues = driver.read();
-				addToMeasure(readValues, measures);
+				addToMeasure(readValues, measuresSensors);
 			}
-			//log measures
-			dao.onSample(measures);
+		
 		});
+		
+		dao.getActuators(function(err, actuators){
+	
+		var finished = after(actuators.length, notifyMeasures);
+		for(var i in actuators){
+			var actuator = actuators[i];
+			//console.log("i: "+i+", pin:" + actuator.pin);
+			gpio.read(actuator, function(actuator, value){
+				//console.log("actuator " + actuator.series[0].name + " has value " + value);
+				addActuatorToMeasure(actuator.series[0].id, value, measuresActuators);
+				finished(measuresSensors, measuresActuators);
+			});
+		}
+		
+	});
 
 	}, null, true, null);
 
