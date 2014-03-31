@@ -9,7 +9,11 @@ var formicheBianco = {name:"formiche(bianco)",pin:"2"};
 var formicheGrigio = {name:"formiche(grigio)",pin:"1"};
 
 function defaultCallback(actuator, value){
-	console.log("setted "+actuator.name+" socket on value "+value);
+	if(value == 1)
+		console.log("switched socket ["+actuator.name+"] ON");
+	if(value == 0)
+		console.log("switched socket ["+actuator.name+"] OFF");
+	
 }
 
 //test: open all the power sockets
@@ -54,6 +58,29 @@ function addActuatorToMeasure(id, value, measures){
 
 function notifyMeasures(measuresSensors, measuresActuators){
 	dao.onSample(measuresSensors, measuresActuators);
+	moveActuators(measuresSensors, measuresActuators);
+}
+
+function moveActuators(measuresSensors, measuresActuators){
+	var tempForm1 = measuresSensors['s1'];
+	var tempForm2 = measuresSensors['s2'];
+	var tempRoaches = measuresSensors['s3'];
+	var actForm1 = measuresActuators['a3']
+	var actForm2 = measuresActuators['a2']
+	var actRoaches = measuresActuators['a1']
+
+	controlTemperature(tempForm1, actForm1, formicheGrigio, 27.0, 27.2);
+	controlTemperature(tempForm2, actForm2, formicheBianco, 27.0, 27.2);
+	controlTemperature(tempRoaches, actRoaches, blatte, 27.0, 27.2);		
+}
+
+function controlTemperature(sensorMeasure, actuatorMeasure, actuator, low, high){
+	if(sensorMeasure > high && actuatorMeasure == 1){
+		gpio.write(actuator, 0, defaultCallback);
+	}
+	if(sensorMeasure < low && actuatorMeasure == 0){
+		gpio.write(actuator, 1, defaultCallback);
+	}
 }
 
 setTimeout(function(){

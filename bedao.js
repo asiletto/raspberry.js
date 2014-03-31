@@ -8,6 +8,7 @@ var BeDAO = function(){
   var self = this;
   this.tables = {};
   this.tables.config = "v1_config";
+  this.tables.last = "v1_last";
   this.tables.raw = "v1_raw";
   this.tables.daily = "v1_daily";
   this.tables.hourly = "v1_hourly";
@@ -57,6 +58,40 @@ function mergeArray(array1,array2) {
 BeDAO.prototype.onSample = function(measures, measuresActuators){
 	
 	var merged = mergeArray(measures,measuresActuators);
+	
+/*db.products.update( { sku: "abc123" },
+                    { $set: {
+                              quantity: 500,
+                              instock: true
+                            }
+                    }
+                  )*/	
+				  
+	var lastLogTs = measures.timestamp;
+	
+	for(var key in measures){
+		var value = measures[key];
+		if(key != "timestamp"){
+			this.adb.collection(this.tables.last).update( { 'serie': key } , 
+														  { $set : {'value': value, 'timestamp': lastLogTs} },
+				function (err, inserted) {
+					if(err) console.log("error:", err);
+				}
+			);
+		}
+	}
+	
+	for(var key in measuresActuators){
+		var value = measuresActuators[key];
+		if(key != "timestamp"){
+			this.adb.collection(this.tables.last).update( { 'serie': key } , 
+														  { $set : {'value': value, 'timestamp': lastLogTs} },
+				function (err, inserted) {
+					if(err) console.log("error:", err);
+				}
+			);
+		}
+	}
 	
 	//add the actuators only to raw collection?
 	this.adb.collection(this.tables.raw).insert( merged ,
